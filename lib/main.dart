@@ -1,0 +1,45 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_ride/core/constants/hive_constants.dart';
+import 'package:go_ride/core/router/app_router.dart';
+import 'package:go_ride/core/theme/app_theme.dart';
+import 'package:go_ride/features/bookings/domain/ride_type.dart';
+import 'package:go_ride/features/bookings/domain/trip_model.dart';
+import 'package:go_ride/features/bookings/domain/trip_status.dart';
+import 'package:go_ride/features/dashboard/domain/spending_limit_model.dart';
+import 'package:hive_flutter/hive_flutter.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize Hive
+  await Hive.initFlutter();
+  
+  // Register Adapters
+  Hive.registerAdapter(RideTypeAdapter());
+  Hive.registerAdapter(TripStatusAdapter());
+  Hive.registerAdapter(TripModelAdapter());
+  Hive.registerAdapter(SpendingLimitModelAdapter()); // This will be available after build
+
+  // Open Boxes
+  await Hive.openBox<TripModel>(HiveConstants.tripBox);
+  await Hive.openBox<SpendingLimitModel>(HiveConstants.settingsBox);
+
+  runApp(const ProviderScope(child: GoRideApp()));
+}
+
+class GoRideApp extends StatelessWidget {
+  const GoRideApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp.router(
+      title: 'GoRide',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: ThemeMode.system,
+      routerConfig: goRouter,
+    );
+  }
+}
