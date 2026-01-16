@@ -10,8 +10,12 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:go_ride/features/bookings/domain/ride_type.dart';
 
+import 'package:go_ride/features/dashboard/presentation/widgets/active_ride_card.dart';
+import 'package:go_ride/features/bookings/domain/trip_status.dart';
+
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
+
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -36,10 +40,19 @@ class DashboardScreen extends ConsumerWidget {
     return Scaffold(
       body: statsAsync.when(
         data: (stats) {
+          // Find if there is any active trip
+          final activeTrips = stats.recentTrips.where((t) => 
+            t.status == TripStatus.requested || 
+            t.status == TripStatus.driverAssigned || 
+            t.status == TripStatus.rideStarted
+          ).toList();
+          
+          final activeTrip = activeTrips.isNotEmpty ? activeTrips.first : null;
+
           return CustomScrollView(
             slivers: [
               SliverAppBar.large(
-                title: const Text('GoRide Dashboard'),
+                title: const Text('GoRide'),
                 centerTitle: false,
                 actions: [
                   IconButton(
@@ -54,6 +67,13 @@ class DashboardScreen extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      if (activeTrip != null) ...[
+                        Text('Live Trip', style: Theme.of(context).textTheme.titleMedium),
+                        const SizedBox(height: 8),
+                        ActiveRideCard(trip: activeTrip),
+                        const SizedBox(height: 24),
+                      ],
+                    
                       // Stats Row
                       Row(
                         children: [
@@ -85,13 +105,13 @@ class DashboardScreen extends ConsumerWidget {
                       const SizedBox(height: 24),
                       
                       // Chart Section
-                      Text('Rides by Type', style: Theme.of(context).textTheme.titleLarge),
+                      Text('Ride Analytics', style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 16),
                       TripChart(tripsByType: stats.tripsByType),
                        const SizedBox(height: 24),
                       
                       // Limits Section (Bonus)
-                      Text('Monthly Spending', style: Theme.of(context).textTheme.titleLarge),
+                      Text('Spending Limits', style: Theme.of(context).textTheme.titleLarge),
                       const SizedBox(height: 16),
                       limitsAsync.when(
                         data: (limits) {
@@ -105,6 +125,9 @@ class DashboardScreen extends ConsumerWidget {
                                
                                return Card(
                                  margin: const EdgeInsets.only(bottom: 12),
+                                 elevation: 0,
+                                 color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                                  child: Padding(
                                    padding: const EdgeInsets.all(12.0),
                                    child: Column(
@@ -113,8 +136,18 @@ class DashboardScreen extends ConsumerWidget {
                                        Row(
                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                          children: [
-                                           Text(type.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
-                                           Text('${NumberFormat.currency(symbol: '\$').format(spent)} / ${limit > 0 ? NumberFormat.currency(symbol: '\$').format(limit) : "No Limit"}'),
+                                           Row(children: [
+                                              Icon(_getIconForType(type), size: 16, color: Colors.grey),
+                                              const SizedBox(width: 8),
+                                              Text(type.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                           ]),
+                                           Text(
+                                             '${NumberFormat.currency(symbol: '\$').format(spent)} / ${limit > 0 ? NumberFormat.currency(symbol: '\$').format(limit) : "No Limit"}',
+                                              style: TextStyle(
+                                                color: isOverLimit ? Colors.red : Theme.of(context).colorScheme.onSurface,
+                                                fontWeight: FontWeight.bold
+                                              ),
+                                           ),
                                          ],
                                        ),
                                        const SizedBox(height: 8),
@@ -155,22 +188,44 @@ class DashboardScreen extends ConsumerWidget {
                       else
                         ...stats.recentTrips.take(5).map((trip) => Card(
                           elevation: 0,
-                          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
-                          margin: const EdgeInsets.only(bottom: 8),
+                          color: Theme.of(context).colorScheme.surface,
+                          margin: const EdgeInsets.only(bottom: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.grey.withOpacity(0.1))),
                           child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: trip.status.color.withOpacity(0.2),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                            leading: Container(
+                              padding: const EdgeInsets.all(10),
+                              decoration: BoxDecoration(
+                                color: trip.status.color.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
                               child: Icon(
                                 _getIconForType(trip.rideType),
                                 color: trip.status.color,
                                 size: 20,
                               ),
                             ),
-                            title: Text(trip.dropLocation, maxLines: 1, overflow: TextOverflow.ellipsis),
-                            subtitle: Text('${trip.status.displayName} • ${DateFormat.MMMd().format(trip.date)}'),
-                            trailing: Text(
-                              NumberFormat.currency(symbol: '\$').format(trip.fareAmount),
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            title: Text(trip.dropLocation, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            subtitle: Column(
+                               crossAxisAlignment: CrossAxisAlignment.start,
+                               children: [
+                                 const SizedBox(height: 4),
+                                 Text(DateFormat.MMMEd().add_jm().format(trip.date), style: const TextStyle(fontSize: 12)),
+                               ]
+                            ), 
+                            trailing: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  NumberFormat.currency(symbol: '\$').format(trip.fareAmount),
+                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                                ),
+                                Text(
+                                  trip.status.displayName,
+                                  style: TextStyle(color: trip.status.color, fontSize: 10, fontWeight: FontWeight.bold),
+                                ),
+                              ],
                             ),
                             onTap: () {
                               // Edit or View Trip
@@ -197,12 +252,14 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
+
   IconData _getIconForType(RideType type) {
     switch (type) {
       case RideType.mini: return Icons.directions_car;
-      case RideType.sedan: return Icons.airport_shuttle; // Or better car icon
-      case RideType.auto: return Icons.electric_rickshaw; // If available, else bus/car
+      case RideType.sedan: return Icons.airport_shuttle;
+      case RideType.auto: return Icons.electric_rickshaw;
       case RideType.bike: return Icons.two_wheeler;
     }
   }
 }
+

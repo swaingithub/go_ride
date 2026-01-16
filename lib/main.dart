@@ -6,7 +6,9 @@ import 'package:go_ride/core/theme/app_theme.dart';
 import 'package:go_ride/features/bookings/domain/ride_type.dart';
 import 'package:go_ride/features/bookings/domain/trip_model.dart';
 import 'package:go_ride/features/bookings/domain/trip_status.dart';
+import 'package:go_ride/features/bookings/data/trip_repository.dart';
 import 'package:go_ride/features/dashboard/domain/spending_limit_model.dart';
+
 import 'package:hive_flutter/hive_flutter.dart';
 
 void main() async {
@@ -22,10 +24,14 @@ void main() async {
   Hive.registerAdapter(SpendingLimitModelAdapter()); // This will be available after build
 
   // Open Boxes
-  await Hive.openBox<TripModel>(HiveConstants.tripBox);
+  final tripBox = await Hive.openBox<TripModel>(HiveConstants.tripBox);
   await Hive.openBox<SpendingLimitModel>(HiveConstants.settingsBox);
 
+  // Seed Data if empty
+  await TripRepository(tripBox).checkAndSeed();
+
   runApp(const ProviderScope(child: GoRideApp()));
+
 }
 
 class GoRideApp extends StatelessWidget {
