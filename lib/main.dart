@@ -8,8 +8,10 @@ import 'package:go_ride/features/bookings/domain/trip_model.dart';
 import 'package:go_ride/features/bookings/domain/trip_status.dart';
 import 'package:go_ride/features/bookings/data/trip_repository.dart';
 import 'package:go_ride/features/dashboard/domain/spending_limit_model.dart';
+import 'package:go_ride/core/theme/theme_provider.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,18 +36,23 @@ void main() async {
 
 }
 
-class GoRideApp extends StatelessWidget {
+
+
+class GoRideApp extends ConsumerWidget {
   const GoRideApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
+    
     return MaterialApp.router(
       title: 'GoRide',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       routerConfig: goRouter,
     );
   }
 }
+
