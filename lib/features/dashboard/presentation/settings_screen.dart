@@ -28,7 +28,8 @@ class SettingsScreen extends ConsumerWidget {
                 return Card(
                   child: ListTile(
                     title: Text(type.displayName),
-                    subtitle: Text('Current Limit: \$${currentLimit.toStringAsFixed(0)}'),
+                    subtitle: Text('Current Limit: ₹${currentLimit.toStringAsFixed(0)}'),
+
                     trailing: IconButton(
                       icon: const Icon(Icons.edit),
                       onPressed: () async {
@@ -85,7 +86,8 @@ class _EditLimitDialogState extends State<_EditLimitDialog> {
         controller: _controller,
         keyboardType: TextInputType.number,
         decoration: const InputDecoration(
-          prefixText: '\$ ',
+          prefixText: '₹ ',
+
           labelText: 'Monthly Limit',
         ),
       ),

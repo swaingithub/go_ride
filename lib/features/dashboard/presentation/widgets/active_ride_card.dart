@@ -64,11 +64,12 @@ class ActiveRideCard extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  NumberFormat.currency(symbol: '\$').format(trip.fareAmount),
+                  NumberFormat.currency(symbol: '₹', decimalDigits: 0).format(trip.fareAmount),
                   style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
               ],
             ),
             const SizedBox(height: 20),

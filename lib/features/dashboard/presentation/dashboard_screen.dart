@@ -94,8 +94,9 @@ class DashboardScreen extends ConsumerWidget {
                               height: 140,
                               child: StatCard(
                                 title: 'Total Spent',
-                                value: NumberFormat.currency(symbol: '\$').format(stats.totalAmountSpent),
+                                value: NumberFormat.currency(symbol: '₹', decimalDigits: 0).format(stats.totalAmountSpent),
                                 icon: Icons.attach_money,
+
                                 color: AppTheme.secondaryColor,
                               ),
                             ),
@@ -142,8 +143,9 @@ class DashboardScreen extends ConsumerWidget {
                                               Text(type.displayName, style: const TextStyle(fontWeight: FontWeight.bold)),
                                            ]),
                                            Text(
-                                             '${NumberFormat.currency(symbol: '\$').format(spent)} / ${limit > 0 ? NumberFormat.currency(symbol: '\$').format(limit) : "No Limit"}',
+                                             '${NumberFormat.currency(symbol: '₹', decimalDigits: 0).format(spent)} / ${limit > 0 ? NumberFormat.currency(symbol: '₹', decimalDigits: 0).format(limit) : "No Limit"}',
                                               style: TextStyle(
+
                                                 color: isOverLimit ? Colors.red : Theme.of(context).colorScheme.onSurface,
                                                 fontWeight: FontWeight.bold
                                               ),
@@ -218,9 +220,10 @@ class DashboardScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
                                 Text(
-                                  NumberFormat.currency(symbol: '\$').format(trip.fareAmount),
+                                  NumberFormat.currency(symbol: '₹', decimalDigits: 0).format(trip.fareAmount),
                                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                                 ),
+
                                 Text(
                                   trip.status.displayName,
                                   style: TextStyle(color: trip.status.color, fontSize: 10, fontWeight: FontWeight.bold),
