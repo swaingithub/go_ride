@@ -5,6 +5,9 @@ import 'package:go_ride/features/bookings/presentation/create_trip_screen.dart';
 import 'package:go_ride/features/dashboard/presentation/settings_screen.dart';
 import 'package:go_ride/features/bookings/presentation/trips_list_screen.dart';
 import 'package:go_ride/features/splash/presentation/splash_screen.dart';
+import 'package:go_ride/features/bookings/presentation/driver_tracking_screen.dart';
+import 'package:go_ride/features/bookings/domain/trip_model.dart';
+
 
 
 final goRouter = GoRouter(
@@ -30,6 +33,14 @@ final goRouter = GoRouter(
       path: '/trips',
       builder: (context, state) => const TripsListScreen(),
     ),
+    GoRoute(
+      path: '/tracking',
+      builder: (context, state) {
+        final trip = state.extra as TripModel;
+        return DriverTrackingScreen(trip: trip);
+      },
+    ),
   ],
 );
+
 

@@ -246,6 +246,8 @@ class _LocationInputs extends StatelessWidget {
                   decoration: const InputDecoration(
                     hintText: 'Pickup Location',
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
@@ -266,12 +268,15 @@ class _LocationInputs extends StatelessWidget {
                   decoration: const InputDecoration(
                     hintText: 'Where to?',
                     border: InputBorder.none,
+                    enabledBorder: InputBorder.none,
+                    focusedBorder: InputBorder.none,
                     isDense: true,
                     contentPadding: EdgeInsets.zero,
                   ),
                   style: const TextStyle(fontWeight: FontWeight.w500),
                 ),
               ),
+
             ],
           ),
         ],
@@ -308,8 +313,8 @@ class _RideTypeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = isSelected ? AppTheme.primaryColor : Colors.grey[200];
-    final fgColor = isSelected ? Colors.white : Colors.black;
+
+
 
     return GestureDetector(
       onTap: onTap,

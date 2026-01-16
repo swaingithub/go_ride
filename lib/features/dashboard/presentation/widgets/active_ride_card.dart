@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_ride/features/bookings/domain/trip_model.dart';
 import 'package:go_ride/features/bookings/domain/trip_status.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+
 
 class ActiveRideCard extends StatelessWidget {
   final TripModel trip;
@@ -10,8 +12,13 @@ class ActiveRideCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      elevation: 4,
+    return InkWell(
+      onTap: () {
+         GoRouter.of(context).push('/tracking', extra: trip);
+      },
+      child: Card(
+        elevation: 4,
+
       shadowColor: trip.status.color.withOpacity(0.4),
       margin: EdgeInsets.zero,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -100,7 +107,10 @@ class ActiveRideCard extends StatelessWidget {
             ]
           ],
         ),
+        ),
       ),
     );
   }
 }
+
+
